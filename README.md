@@ -127,3 +127,32 @@ queen:0.997
 cricket:0.236
 potato:-0.653
 ```
+## Day 4: Why LLMs Use Matrix Multiplication
+
+Compared a plain Python loop against NumPy's matrix multiplication (`@`) to see why real LLMs can't afford to score words one at a time.
+
+**What it does:**
+- Scores 3 cricketers against an "ideal captain" profile two ways:
+  - A nested loop, computing each dot product by hand
+  - `cricketers @ ideal_captain` — the same scores, computed as one matrix-vector multiplication
+- Both give identical results, but the matrix version is one line instead of a loop
+- Scales the same idea up to realistic LLM size: a 100,000-word vocabulary, each word a 4096-dimensional vector (`vocabulary`), scored against one `requirements` vector
+- Times the loop version vs `vocabulary @ requirements` on this larger data
+
+**Key insight:** A real LLM vocabulary × embedding size is 100,000 × 4096 — looping through that in pure Python took **~350 seconds**. The matrix multiplication version does the exact same math in a fraction of a second, because NumPy runs it in optimized, vectorized C/BLAS code instead of Python's interpreter loop. This is why every LLM operation (attention, next-token scoring, etc.) is written as matrix multiplication, not loops — at billions of parameters, loops are simply too slow to ever finish.
+
+**Example output:**
+```
+one at a time (loop):
+Virat: 208
+Bumrah: 189
+Rohit: 179
+
+All at once (Matrix)
+Virat: 208
+Bumrah: 189
+Rohit: 179
+
+The loop time is: 349.887...
+0.012... (matrix time)
+```
