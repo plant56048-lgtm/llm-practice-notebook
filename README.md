@@ -104,8 +104,26 @@ the king loved the queen and the king...
 
 This shows how adding more context can improve next-word prediction. Modern LLMs use much more sophisticated architectures and learn far more complex patterns, but the basic idea of **using previous context to predict what comes next** is an important foundation.
 
-### Key Takeaway
 
-Day 1 used only **one previous word**.
 
-Day 2 generalized the idea so the model can use **multiple previous words as context**, making it an n-gram language model.
+## Day 3: Vector Similarity & Word Embeddings
+
+Explored how similarity between words is measured mathematically — the foundation of how LLMs represent meaning as vectors.
+
+**What it does:**
+- Implements `dot_product()` and `vector_size()` (magnitude) from scratch
+- Builds `cosine_similarity()` = dot product ÷ (magnitude A × magnitude B)
+- Tests dot product alone first — shows it's misleading when vectors differ in scale (e.g. `rajat` vs `rahul`, same direction but 10x bigger, dot product way overstates difference)
+- Switches to cosine similarity, which normalizes for scale and only measures *direction* — so `rajat` vs `rahul` correctly comes out ~1.0 (nearly identical)
+- Applies this to toy 5-dimensional "word embeddings" for king, queen, cricket, potato — finds king/queen highly similar, king/potato strongly dissimilar
+- Writes `find_best_word_in_llm()`: given a target vector, ranks a vocabulary by cosine similarity — a tiny version of how an LLM picks the most relevant next token
+
+**Key insight:** Cosine similarity cares about *direction*, not magnitude. Two vectors pointing the same way are "similar" even if one is 10x longer — this is why embeddings compare words by angle, not raw size.
+
+**Example output:**
+```
+king:0.997
+queen:0.997
+cricket:0.236
+potato:-0.653
+```
